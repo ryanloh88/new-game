@@ -4,6 +4,7 @@ var userClickedPattern = []
 var level = 0
 var initial = 0
 var userLevel = 0
+var fail = false
 
 $(document).keydown(function(){
     startGame()
@@ -11,18 +12,25 @@ $(document).keydown(function(){
 
 //detect when user has pressed a button
 $(".btn").click(function(event){   
-    if (initial > 0){
+    if (initial > 0 ) {
+        
         var userChosenColour = this.id
         animate(userChosenColour)
         userClickedPattern.push(userChosenColour)
+      
         checkAnswer()
     }
       
 })
 
 function checkAnswer(){
-    if (gamePattern[userLevel] == userClickedPattern[userLevel]){
-        setTimeout(nextSequence, 2000)
+    if (gamePattern[userLevel] === userClickedPattern[userLevel]){
+        if (userClickedPattern.length > gamePattern.length ){
+            gameFails()
+        }else{
+            nextSequence()
+        }
+        
     }else{
         gameFails()
     }
@@ -32,6 +40,14 @@ function checkAnswer(){
 function nextSequence(){
 
     if (userLevel == level) { //only activated if player clears challenge
+    setTimeout(upLevel, 2000)
+
+    }else{
+        userLevel += 1
+    }
+    
+}
+function upLevel(){
     var randomNumber = Math.floor(Math.random() * 4) ;
     var randomChosenColour = buttonColours[randomNumber]
     gamePattern.push(randomChosenColour)
@@ -40,14 +56,11 @@ function nextSequence(){
     userLevel = 0
     userClickedPattern =[]
     $("h1").text("LEVEL "+ level)
-    }else{
-        userLevel += 1
-    }
-    
 }
+
 function startGame(){
     if (initial == 0) {
-        initial += 1
+    initial += 1
     var randomNumber = Math.floor(Math.random() * 4) ;
     var randomChosenColour = buttonColours[randomNumber]
     gamePattern.push(randomChosenColour)
@@ -62,15 +75,17 @@ function gameFails(){
     $("h1").text('YOU FAILED')
     $("body").addClass("red")
     setTimeout(gameResets,3000)  
+    
 }
 function gameResets(){
-     gamePattern =[]
-     userClickedPattern = []
-     level = 0
-     initial = 0
-     userLevel = 0
-     $("h1").text("Press A Key to Start")
-     $("body").addClass("nice")
+    location.reload()
+    //  gamePattern =[]
+    //  userClickedPattern = []
+    //  level = 0
+    //  initial = 0
+    //  userLevel = 0
+    //  $("h1").text("Press A Key to Start")
+    //  $("body").addClass("nice")
 }
 function animate(btn){
     let audio = new Audio(`sounds/${btn}.mp3`);
